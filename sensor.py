@@ -4,6 +4,7 @@ import time
 
 
 def is_time():
+    return True
     now = datetime.now()
     current_minute = now.strftime("%M")
     if current_minute == "30" or current_minute == "00":
@@ -29,16 +30,22 @@ while True:
     if is_time():
         if "YES" in data:
             (discard, sep, reading) = data.partition(' t=')
-            t = float(reading) / 10.0
+            t = float(reading) / 1000.0
             print("Sensor 1 {:.1f}".format(t))
             with open("Sensor1.txt", "a") as f:
-                f.write('\n'.join(str(t)))
+                f.write("\n")
+                f.write(str(t))
+            with open("Sensor1.txt", 'a') as f:
+                f.write("\n")
         if "YES" in data2:
             (discard, sep, reading) = data.partition(' t=')
-            t = float(reading) / 10.0
+            t = float(reading) / 1000.0
             print("Sensor 2 {:.1f}".format(t))
             with open("Sensor2.txt", 'a') as f:
-                f.write('\n'.join(str(t)))
+                f.write("\n")
+                f.write(str(t))
+            with open("Sensor2.txt", 'a') as f:
+                f.write("\n")
         else:
             print("ERROR")
         time.sleep(120)

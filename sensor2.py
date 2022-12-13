@@ -4,20 +4,15 @@ import time
 
 
 def is_time(): # Alle 30 Minuten die Daten auslesen.
+    return True
     now = datetime.now()
     current_minute = now.strftime("%M")
     print(current_minute)
-    if "0" in current_minute or "5" in current_minute:
-        print("lol")
+    if current_minute == "30" or current_minute == "00":
+        print("fa")
         return True
     else:
         return False
-    #if current_minute == "30" or current_minute == "00" or current_minute == "15" or current_minute == "45":
-    #    print("fa")
-    #    return True
-    #else:
-    #    return False
-
 
 
 sensor1 = "/sys/bus/w1/devices/28-3c01f0960400/w1_slave"  # Sensor 1
@@ -36,6 +31,7 @@ while True:
         f2 = open(sensor2, "r")
         data = f.read()
         data2 = f2.read()
+        
         print("Its time")
         print("Data ready")
         (discard, sep, reading) = data.partition(' t=')
@@ -57,6 +53,5 @@ while True:
             current_minute = now.strftime("%H:%M")
             f.write(current_minute + " ," + str(t))
 
-        time.sleep(120)
     else:
         time.sleep(20)

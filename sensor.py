@@ -1,53 +1,39 @@
 #!/usr/bin/env python
-from datetime import datetime  # Zeit modul um festzulegen wie oft messungen gemacht werden
-import time
+from datetime import datetime  # Modul um die aktuelle Zeit auszulesen.
+import time # Modul um das Programm für eine Bestimmte Zeit zu stoppen.
 
 
-def is_time(): # Alle 30 Minuten die Daten auslesen.
-    now = datetime.now()
-    current_minute = now.strftime("%M")
-    print(current_minute)
-    if "0" in current_minute or "5" in current_minute:
-        print("lol")
+def is_time(): # Funktion, die alle 5 Minuten die Daten ausliest.
+    current_minute = datetime.now().strftime("%M") # Die aktuelle Minute auslesen als Variable abspeichern.
+    if "0" in current_minute or "5" in current_minute: # Wenn eine 5 oder 0 in der aktuellen Minute ist, z.B 20 oder 25, Funktion richtig setzen.
         return True
-    else:
+    else: # Wenn keine 5 oder 0 in der aktuellen Minute ist die Funktion Falsch setzen
         return False
-    #if current_minute == "30" or current_minute == "00" or current_minute == "15" or current_minute == "45":
-    #    print("fa")
-    #    return True
-    #else:
-    #    return False
 
 
 
-sensor1 = "/sys/bus/w1/devices/28-3c01f0960400/w1_slave"  # Sensor 1
-sensor2 = "/sys/bus/w1/devices/28-3c01f096db57/w1_slave"  # Sensor 2
-f = open(sensor1, "r")  # Auf beide Sensoren zugreifen
+sensor1 = "/sys/bus/w1/devices/28-3c01f0960400/w1_slave"  # Variablen vom Dateipfad der Sensoren
+sensor2 = "/sys/bus/w1/devices/28-3c01f096db57/w1_slave"
+f = open(sensor1, "r")  #Auf beide Sensoren zugreifen mit der open() Funktion.
 f2 = open(sensor2, "r")
 
-sensor1_text = open("Sensor1.txt", "a")
+sensor1_text = open("Sensor1.txt", "a") # Datenbanken für die jeweiligen Temperaturwerte öffnen. "a" steht hier für "append" also Werte der Datei hinzufügen.
 sensor2_text = open("Sensor2.txt", "a")
 
-data = f.read()  # Die Daten auslesen
-data2 = f2.read()
-while True:
-    if is_time():
-        f = open(sensor1, "r")  # Auf beide Sensoren zugreifen
-        f2 = open(sensor2, "r")
-        data = f.read()
-        data2 = f2.read()
-        print("Its time")
-        print("Data ready")
-        (discard, sep, reading) = data.partition(' t=')
-        t = float(reading) / 1000.0
-        print("Sensor 1 {:.1f}".format(t))
-        with open("Sensor1.txt", "a") as f:
+while True: # Dauerschleife um alle 20 Sekunden zu überprüfen ob es Zeit ist Messungen zu machen(Funktion is_time())
+    if is_time(): #Wenn es Zeit ist: Temperatur auslesen und speichern
+
+        data = open(sensor1, "r").read()  # Auf beide Sensoren erneut zugreifen um aktuelle Temperatur zu bekommen.
+        data2 = open(sensor2, "r").read()
+        (discard, sep, reading) = data.partition(' t=') # Nur die Temperatur herausfiltern aus den Daten
+        t = float(reading) / 1000.0 # Temperatur umrechenen
+        with open("Sensor1.txt", "a") as f: # Datenbank öffnen und Temperatur spreichern.
             f.write("\n")
             now = datetime.now()
-            current_minute = now.strftime("%H:%M")
-            f.write(current_minute + " ," + str(t))
+            current_minute = now.strftime("%H:%M") # Die aktuelle Zeit zu den Temperaturdaten hinzufügen
+            f.write(current_minute + " ," + str(t)) # Abspeichern der daten
         
-        print("Data 2 ready")
+        # Gleiches Vorgehen
         (discard, sep, reading) = data2.partition(' t=')
         t = float(reading) / 1000.0
         print("Sensor 2 {:.1f}".format(t))
@@ -57,6 +43,6 @@ while True:
             current_minute = now.strftime("%H:%M")
             f.write(current_minute + " ," + str(t))
 
-        time.sleep(120)
+        time.sleep(120) # 120 Sekunden warten um zwei Messungen auf einmal zu verhindern
     else:
-        time.sleep(20)
+        time.sleep(20) #20 Sekunden warten um den RaspberryPi nicht zu überlasten.
